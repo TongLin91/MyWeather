@@ -16,6 +16,7 @@
 		06D6EDD91ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDD71ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift */; };
 		06D6EDDA1ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06D6EDD81ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib */; };
 		06D6EDDC1ECFE5410054E3C0 /* APIRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDDB1ECFE5410054E3C0 /* APIRequestManager.swift */; };
+		06D6EDDE1ECFF20D0054E3C0 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDDD1ECFF20D0054E3C0 /* Weather.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		06D6EDD71ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HistoryWeatherTableViewCell.swift; path = Views/HistoryWeatherTableViewCell.swift; sourceTree = "<group>"; };
 		06D6EDD81ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HistoryWeatherTableViewCell.xib; path = Views/HistoryWeatherTableViewCell.xib; sourceTree = "<group>"; };
 		06D6EDDB1ECFE5410054E3C0 /* APIRequestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APIRequestManager.swift; path = Managers/APIRequestManager.swift; sourceTree = "<group>"; };
+		06D6EDDD1ECFF20D0054E3C0 /* Weather.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 		069A8D201ECEAD37001A0184 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				06D6EDDD1ECFF20D0054E3C0 /* Weather.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -186,6 +189,7 @@
 				069A8D0B1ECEAC35001A0184 /* AppDelegate.swift in Sources */,
 				06D6EDDC1ECFE5410054E3C0 /* APIRequestManager.swift in Sources */,
 				069A8D131ECEAC35001A0184 /* MyWeather.xcdatamodeld in Sources */,
+				06D6EDDE1ECFF20D0054E3C0 /* Weather.swift in Sources */,
 				06D6EDD91ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

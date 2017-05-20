@@ -24,13 +24,18 @@ class MainViewController: UIViewController {
         setupTableView()
         
         if let currentLocation = locationManager.location{
+            // zooming map to user location
             self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
+            
+            // using current location to fetch weather data
+            APIRequestManager.sharedManager.fetchCurrentWeather(coordinate: currentLocation.coordinate, completion: { (data) in
+                // Parsing weather data
+                dump(data)
+            }, failure: { (err) in
+                // Handle api error
+                print(err!.localizedDescription)
+            })
         }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     func setupTableView(){

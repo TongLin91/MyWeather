@@ -7,20 +7,24 @@
 //
 
 import Foundation
+import CoreLocation
 
 class APIRequestManager {
     
     static let sharedManager = APIRequestManager()
+    private let apiKey = "766f5884a7ce4b8d39e015457a472ff3"
     
-    func fetchCurrentWeather(endPoint: URL, completion: @escaping ((Data?)->Void)){
-        let request = URLSession(configuration: URLSessionConfiguration.default)
+    func fetchCurrentWeather(coordinate: CLLocationCoordinate2D, completion: @escaping (Data?)->Void, failure: @escaping (Error?) -> Void){
+        let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?appid=\(apiKey)&units=imperial&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
-        request.dataTask(with: endPoint) {(data: Data?, _, error: Error?) in
+        let session = URLSession(configuration: URLSessionConfiguration.default)
+        session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+            if error != nil{
+                failure(error)
+            }
             
-            if let validData = data{
-                completion(validData)
-            }else{
-                print(error?.localizedDescription ?? "Unknow error during api call - \(endPoint.absoluteString)")
+            if data != nil{
+                completion(data)
             }
         }.resume()
     }
