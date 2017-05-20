@@ -15,11 +15,17 @@ class MainViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tableView: UITableView!
 
+    var locationManager = CLLocationManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        setupLocationManager()
         setupTableView()
+        
+        if let currentLocation = locationManager.location{
+            self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -33,9 +39,15 @@ class MainViewController: UIViewController {
         tableView.register(UINib(nibName: "HistoryWeatherTableViewCell", bundle: nil), forCellReuseIdentifier: HistoryWeatherTableViewCell.cellIdentifier)
     }
    
-
+    func setupLocationManager(){
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
+    }
+    
 }
 
+//MARK: - Table View delegation
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 0
@@ -53,6 +65,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     
 }
 
+//MARK: - Core Location delegation
+extension MainViewController: CLLocationManagerDelegate {
+    
+}
 
 
 
