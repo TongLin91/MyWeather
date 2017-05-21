@@ -17,6 +17,7 @@
 		06D6EDDA1ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06D6EDD81ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib */; };
 		06D6EDDC1ECFE5410054E3C0 /* APIRequestManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDDB1ECFE5410054E3C0 /* APIRequestManager.swift */; };
 		06D6EDDE1ECFF20D0054E3C0 /* Weather+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDDD1ECFF20D0054E3C0 /* Weather+JSON.swift */; };
+		06D6EDE21ED173930054E3C0 /* CurrentWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06D6EDE11ED173930054E3C0 /* CurrentWeatherView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		06D6EDD81ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HistoryWeatherTableViewCell.xib; path = Views/HistoryWeatherTableViewCell.xib; sourceTree = "<group>"; };
 		06D6EDDB1ECFE5410054E3C0 /* APIRequestManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APIRequestManager.swift; path = Managers/APIRequestManager.swift; sourceTree = "<group>"; };
 		06D6EDDD1ECFF20D0054E3C0 /* Weather+JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Weather+JSON.swift"; sourceTree = "<group>"; };
+		06D6EDE11ED173930054E3C0 /* CurrentWeatherView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CurrentWeatherView.swift; path = Views/CurrentWeatherView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				06D6EDD71ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift */,
 				06D6EDD81ECFDF110054E3C0 /* HistoryWeatherTableViewCell.xib */,
+				06D6EDE11ED173930054E3C0 /* CurrentWeatherView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 				069A8D0B1ECEAC35001A0184 /* AppDelegate.swift in Sources */,
 				06D6EDDC1ECFE5410054E3C0 /* APIRequestManager.swift in Sources */,
 				069A8D131ECEAC35001A0184 /* MyWeather.xcdatamodeld in Sources */,
+				06D6EDE21ED173930054E3C0 /* CurrentWeatherView.swift in Sources */,
 				06D6EDDE1ECFF20D0054E3C0 /* Weather+JSON.swift in Sources */,
 				06D6EDD91ECFDF110054E3C0 /* HistoryWeatherTableViewCell.swift in Sources */,
 			);

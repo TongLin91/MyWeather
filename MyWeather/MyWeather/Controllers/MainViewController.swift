@@ -15,6 +15,15 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tableView: UITableView!
+    @IBAction func add(_ sender: UIBarButtonItem) {
+        if let currentLocation = locationManager.location{
+            // zooming map to user location
+            self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
+            
+            self.getCurrentWeather(currentLocation.coordinate)
+        }
+        
+    }
 
     var locationManager = CLLocationManager()
     
@@ -26,9 +35,12 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
         return appDelegate.persistentContainer.viewContext
     }
     
+    var currentWeather: Weather?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        mapView.delegate = self
         setupLocationManager()
         setupTableView()
         initializeFetchedResultsController()
@@ -37,51 +49,14 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
             // zooming map to user location
             self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
             
-            // using current location to fetch weather data
-            APIRequestManager.sharedManager.fetchCurrentWeather(coordinate: currentLocation.coordinate, completion: { (data) in
-                // Parsing weather data
-                if let json = try? JSONSerialization.jsonObject(with: data!, options: []) {
-                    if let dict = json as? [String: AnyObject]{
-                        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                        let pc = appDelegate.persistentContainer
-                        
-                        pc.performBackgroundTask { (context: NSManagedObjectContext) in
-                            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                            
-                            // insert core data objects
-                            // now it goes in the database
-                            
-                            
-                            let entry = NSEntityDescription.insertNewObject(forEntityName: "Weather", into: self.mainContext) as! Weather
-                            entry.populate(dict)
-                            
-                            dump(entry)
-                            
-                            do {
-                                try context.save()
-                            }
-                            catch let error {
-                                print(error)
-                            }
-                            
-                            DispatchQueue.main.async {
-                                self.initializeFetchedResultsController()
-                                self.tableView.reloadData()
-                            }
-                            
-                        }
-                    }
-                }
-            }, failure: { (err) in
-                // Handle api error
-                print(err!.localizedDescription)
-            })
+            self.getCurrentWeather(currentLocation.coordinate)
         }
     }
     
     func initializeFetchedResultsController() {
         let request: NSFetchRequest<Weather> = Weather.fetchRequest()
-        let sort = NSSortDescriptor(key: "name", ascending: true)
+        let sort = NSSortDescriptor(key: "timeStamp", ascending: false)
+        request.fetchBatchSize = 5
         request.sortDescriptors = [sort]
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: mainContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -94,6 +69,42 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
         }
     }
     
+    func getCurrentWeather(_ coor: CLLocationCoordinate2D){
+        // using current location to fetch weather data
+        APIRequestManager.sharedManager.fetchCurrentWeather(coordinate: coor, completion: { (data) in
+            // Parsing weather data
+            if let json = try? JSONSerialization.jsonObject(with: data!, options: []) {
+                if let dict = json as? [String: AnyObject]{
+                    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                    let pc = appDelegate.persistentContainer
+                    
+                    pc.performBackgroundTask { (context: NSManagedObjectContext) in
+                        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                        
+                        // insert core data objects
+                        // now it goes in the database
+                        
+                        let entry = NSEntityDescription.insertNewObject(forEntityName: "Weather", into: self.mainContext) as! Weather
+                        entry.populate(dict)
+                        self.currentWeather = entry
+                        
+                        appDelegate.saveContext()
+                        
+                        DispatchQueue.main.sync {
+                            self.initializeFetchedResultsController()
+                            self.tableView.reloadData()
+                        }
+                        
+                    }
+                }
+            }
+        }, failure: { (err) in
+            // Handle api error
+            print(err!.localizedDescription)
+        })
+
+    }
+    
     func setupTableView(){
         tableView.delegate = self
         tableView.dataSource = self
@@ -102,6 +113,7 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
    
     func setupLocationManager(){
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 500
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
     }
@@ -125,7 +137,8 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             return 0
         }
         let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+        print("table has \(sectionInfo.numberOfObjects) items")
+        return sectionInfo.numberOfObjects > 6 ? 5 : sectionInfo.numberOfObjects
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -135,6 +148,20 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         cell.textLabel?.text = weather.name! + ", " + String(weather.temp)
         return cell
+    }
+    
+}
+
+extension MainViewController: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        print("Add weather overlay")
+//        if let info = currentWeather{
+//            
+//        }
+    }
+    
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+        print("Remove weather overlay")
     }
     
 }

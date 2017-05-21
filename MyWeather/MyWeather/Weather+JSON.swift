@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import MapKit
 
 extension Weather {
 
@@ -17,6 +18,11 @@ extension Weather {
             print("no Name")
         }
         
+        if let id = dict["id"] as? Int32 {
+            self.id = id
+        } else {
+            print("no ID")
+        }
         
         if let coor = dict["coord"] as? [String: Any],
             let lon = coor["lon"] as? Double,
@@ -42,7 +48,18 @@ extension Weather {
         } else {
             print("No weather icon")
         }
+        
+        self.timeStamp = NSDate()
     }
     
-    
+//    func getOverlayBoundingMapRect() -> MKMapRect{
+//        let topLeft = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat+0.001, longitude: self.lon-0.001))
+//        let topRight = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat+0.001, longitude: self.lon+0.001))
+//        let bottomLeft = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat-0.001, longitude: self.lon-0.001))
+//        
+//        return MKMapRectMake(topLeft.x,
+//                             topLeft.y,
+//                             fabs(topLeft.x-topRight.x),
+//                             fabs(topLeft.y - bottomLeft.y))
+//    }
 }
