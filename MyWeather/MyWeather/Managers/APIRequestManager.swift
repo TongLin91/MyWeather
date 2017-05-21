@@ -14,6 +14,7 @@ class APIRequestManager {
     static let sharedManager = APIRequestManager()
     private let apiKey = "766f5884a7ce4b8d39e015457a472ff3"
     
+    // API call for weather data with coordinate
     func fetchCurrentWeather(coordinate: CLLocationCoordinate2D, completion: @escaping (Data?)->Void, failure: @escaping (Error?) -> Void){
         let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?appid=\(apiKey)&units=imperial&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)")!
         
@@ -29,6 +30,7 @@ class APIRequestManager {
         }.resume()
     }
     
+    // Download weather icon
     func fetchWeatherIcon(name: String, completion: @escaping (Data?)->Void, failure: @escaping (Error?) -> Void){
         let url = URL(string: "http://openweathermap.org/img/w/\(name).png")!
         

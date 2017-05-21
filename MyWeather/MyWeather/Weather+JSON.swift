@@ -10,7 +10,7 @@ import Foundation
 import MapKit
 
 extension Weather {
-
+    // Parsing json data
     func populate(_ dict: [String: AnyObject]) {
         if let name = dict["name"] as? String {
             self.name = name

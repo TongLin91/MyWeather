@@ -11,19 +11,10 @@ import MapKit
 import CoreLocation
 import CoreData
 
-class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
+class MainViewController: UIViewController, NSFetchedResultsControllerDelegate, CLLocationManagerDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var tableView: UITableView!
-    @IBAction func add(_ sender: UIBarButtonItem) {
-        if let currentLocation = locationManager.location{
-            // zooming map to user location
-            self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
-            
-            self.getCurrentWeather(currentLocation.coordinate)
-        }
-        
-    }
 
     var locationManager = CLLocationManager()
     
@@ -109,6 +100,7 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
 
     }
     
+    // Remove duplicate coordinates
     func isExist(data: Weather) -> Bool {
         let request: NSFetchRequest<Weather> = Weather.fetchRequest()
         let sort = NSSortDescriptor(key: "timeStamp", ascending: false)
@@ -158,7 +150,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             return 0
         }
         let sectionInfo = sections[section]
-        print("table has \(sectionInfo.numberOfObjects) items")
+        // Set maximum number of rows to 5
         return sectionInfo.numberOfObjects > 6 ? 5 : sectionInfo.numberOfObjects
     }
     
@@ -167,6 +159,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         let weather = fetchedResultsController.object(at: indexPath)
         
+        // Update weather data for history coordinates
         APIRequestManager.sharedManager.fetchCurrentWeather(coordinate: CLLocationCoordinate2D(latitude: weather.lat, longitude: weather.lon), completion: { (data) in
             
             if let json = try? JSONSerialization.jsonObject(with: data!, options: []) {
@@ -209,8 +202,8 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
 // MARK: - MK MapView delegation
 extension MainViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        print("Add weather overlay")
         
+        // Add popup accessory views when user tapped on current location indicator
         if let info = currentWeather{
             
             // Center Image
@@ -238,16 +231,6 @@ extension MainViewController: MKMapViewDelegate {
             view.rightCalloutAccessoryView = rightAccessory
         }
     }
-    
-    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
-        print("Remove weather overlay")
-    }
-    
-}
-
-// MARK: - Core Location delegation
-extension MainViewController: CLLocationManagerDelegate {
-    
 }
 
 
