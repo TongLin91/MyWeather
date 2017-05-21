@@ -28,4 +28,19 @@ class APIRequestManager {
             }
         }.resume()
     }
+    
+    func fetchWeatherIcon(name: String, completion: @escaping (Data?)->Void, failure: @escaping (Error?) -> Void){
+        let url = URL(string: "http://openweathermap.org/img/w/\(name).png")!
+        
+        let session: URLSession = URLSession(configuration: URLSessionConfiguration.default)
+        session.dataTask(with: url) { (data: Data?, response: URLResponse?, error: Error?) in
+            if error != nil {
+                failure(error)
+            }
+            
+            if data != nil{
+                completion(data)
+            }
+        }.resume()
+    }
 }

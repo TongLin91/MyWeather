@@ -49,17 +49,9 @@ extension Weather {
             print("No weather icon")
         }
         
-        self.timeStamp = NSDate()
+        if self.timeStamp == nil{
+            self.timeStamp = NSDate()
+        }
     }
-    
-//    func getOverlayBoundingMapRect() -> MKMapRect{
-//        let topLeft = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat+0.001, longitude: self.lon-0.001))
-//        let topRight = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat+0.001, longitude: self.lon+0.001))
-//        let bottomLeft = MKMapPointForCoordinate(CLLocationCoordinate2D(latitude: self.lat-0.001, longitude: self.lon-0.001))
-//        
-//        return MKMapRectMake(topLeft.x,
-//                             topLeft.y,
-//                             fabs(topLeft.x-topRight.x),
-//                             fabs(topLeft.y - bottomLeft.y))
-//    }
+
 }

@@ -44,10 +44,13 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
         setupLocationManager()
         setupTableView()
         initializeFetchedResultsController()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         
         if let currentLocation = locationManager.location{
             // zooming map to user location
-            self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15)), animated: true)
+            self.mapView.setRegion(MKCoordinateRegion(center: currentLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)), animated: true)
             
             self.getCurrentWeather(currentLocation.coordinate)
         }
@@ -56,7 +59,6 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
     func initializeFetchedResultsController() {
         let request: NSFetchRequest<Weather> = Weather.fetchRequest()
         let sort = NSSortDescriptor(key: "timeStamp", ascending: false)
-        request.fetchBatchSize = 5
         request.sortDescriptors = [sort]
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: mainContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -88,6 +90,8 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
                         entry.populate(dict)
                         self.currentWeather = entry
                         
+                        _ = self.isExist(data: entry)
+                        
                         appDelegate.saveContext()
                         
                         DispatchQueue.main.sync {
@@ -105,6 +109,23 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
 
     }
     
+    func isExist(data: Weather) -> Bool {
+        let request: NSFetchRequest<Weather> = Weather.fetchRequest()
+        let sort = NSSortDescriptor(key: "timeStamp", ascending: false)
+        
+        request.sortDescriptors = [sort]
+        request.predicate = NSPredicate(format: "id == %u", data.id)
+        
+        let res = try! mainContext.fetch(request)
+        if res.count > 1 {
+            self.mainContext.delete(res.last!)
+
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func setupTableView(){
         tableView.delegate = self
         tableView.dataSource = self
@@ -113,14 +134,14 @@ class MainViewController: UIViewController, NSFetchedResultsControllerDelegate {
    
     func setupLocationManager(){
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 500
+        locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
     }
     
 }
 
-//MARK: - Table View delegation and data source
+// MARK: - Table View delegation and data source
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         guard let sections = fetchedResultsController.sections else {
@@ -146,18 +167,76 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         
         let weather = fetchedResultsController.object(at: indexPath)
         
-        cell.textLabel?.text = weather.name! + ", " + String(weather.temp)
+        APIRequestManager.sharedManager.fetchCurrentWeather(coordinate: CLLocationCoordinate2D(latitude: weather.lat, longitude: weather.lon), completion: { (data) in
+            
+            if let json = try? JSONSerialization.jsonObject(with: data!, options: []) {
+                if let dict = json as? [String: AnyObject]{
+                    
+                    weather.populate(dict)
+                        
+                    DispatchQueue.main.async {
+                        cell.nameLabel.text = weather.name ?? ""
+                        cell.tempLabel.text = "Temp: \(weather.temp)"
+                        cell.humLabel.text = "Humidity: \(weather.humidity)"
+                    }
+                    
+                    APIRequestManager.sharedManager.fetchWeatherIcon(name: weather.icon!, completion: { (data) in
+                        DispatchQueue.main.async {
+                            cell.iconImageView.image = UIImage(data: data!)
+                        }
+                    }, failure: { (err) in
+                        // Handle error
+                        print(err!.localizedDescription)
+                    })
+                    
+                }
+            }
+        
+        }) { (err) in
+            // Handle api error
+            print(err!.localizedDescription)
+        }
+    
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return self.tableView.frame.height/4.2
     }
     
 }
 
+// MARK: - MK MapView delegation
 extension MainViewController: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         print("Add weather overlay")
-//        if let info = currentWeather{
-//            
-//        }
+        
+        if let info = currentWeather{
+            
+            // Center Image
+            APIRequestManager.sharedManager.fetchWeatherIcon(name: info.icon!, completion: { (data) in
+                view.detailCalloutAccessoryView = UIImageView(image: UIImage(data: data!, scale: 0.5))
+            }, failure: { (err) in
+                // Handle error
+                print(err!.localizedDescription)
+            })
+            
+            // Left Accessory
+            let leftAccessory = UILabel(frame: CGRect(x: 0,y: 0,width: 50,height: 30))
+            leftAccessory.text = "Temp\n\(info.temp)"
+            leftAccessory.numberOfLines = 2
+            leftAccessory.textAlignment = .center
+            leftAccessory.font = UIFont(name: "Verdana", size: 10)
+            view.leftCalloutAccessoryView = leftAccessory
+            
+            // Right Accessory
+            let rightAccessory = UILabel(frame: CGRect(x: 0,y: 0,width: 50,height: 30))
+            rightAccessory.text = "Humidity\n\(info.humidity)"
+            rightAccessory.numberOfLines = 2
+            rightAccessory.textAlignment = .center
+            rightAccessory.font = UIFont(name: "Verdana", size: 10)
+            view.rightCalloutAccessoryView = rightAccessory
+        }
     }
     
     func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
@@ -166,7 +245,7 @@ extension MainViewController: MKMapViewDelegate {
     
 }
 
-//MARK: - Core Location delegation
+// MARK: - Core Location delegation
 extension MainViewController: CLLocationManagerDelegate {
     
 }
